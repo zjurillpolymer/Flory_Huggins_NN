@@ -20,3 +20,6 @@ Thumbs.db
 # Large descriptor files (can be regenerated)
 # desc_Chi.csv
 # desc_COSMO.csv
+
+# Ensemble model weights
+ensemble_weights/

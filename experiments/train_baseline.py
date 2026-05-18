@@ -2,12 +2,9 @@ import torch
 import torch.nn as nn
 from torch.optim import AdamW
 from torch.optim.lr_scheduler import ReduceLROnPlateau
-import numpy as np
 from sklearn.metrics import mean_absolute_error, r2_score
-from torch.utils.data import TensorDataset, DataLoader
-
 from models.attention_net import ChiPredictor
-from data_loader import load_data
+from features.data_loader import load_data, df_to_loader
 
 
 def train_one_epoch(model, loader, optimizer, criterion, device, clip=1.0):
@@ -48,19 +45,13 @@ def main():
     print(f"Device: {device}")
 
     data = load_data(batch_size=8)
-    pool_loader = data["pool_loader"]
+    pool_df = data["pool_df"]
     test_loader = data["test_loader"]
 
-    # 从 pool 切 20% 做 validation
-    all_X, all_y = [], []
-    for X, y in pool_loader:
-        all_X.append(X)
-        all_y.append(y)
-    all_X = torch.cat(all_X)
-    all_y = torch.cat(all_y)
-    n_val = int(len(all_X) * 0.2)
-    train_loader = DataLoader(TensorDataset(all_X[:-n_val], all_y[:-n_val]), batch_size=8, shuffle=True)
-    val_loader = DataLoader(TensorDataset(all_X[-n_val:], all_y[-n_val:]), batch_size=8, shuffle=False)
+    pool_df = pool_df.sample(frac=1, random_state=42)  # 打乱
+    n_val = int(len(pool_df) * 0.2)
+    train_loader = df_to_loader(pool_df[:-n_val], batch_size=8, shuffle=True)
+    val_loader = df_to_loader(pool_df[-n_val:], batch_size=8, shuffle=False)
 
     model = ChiPredictor().to(device)
     optimizer = AdamW(model.parameters(), lr=1e-3, weight_decay=0.01)
