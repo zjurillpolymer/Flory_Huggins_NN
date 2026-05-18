@@ -94,13 +94,13 @@ def main():
 
         if val_mae < best_mae:
             best_mae = val_mae
-            torch.save(model.state_dict(), "/Users/arcadio/flory_huggins/models/best_model.pt")
+            torch.save(model.state_dict(), "/models/best_model.pt")
 
         if epoch % 20 == 0 or epoch == 1:
             print(f"Epoch {epoch:3d} | train loss: {train_loss:.4f} | val loss: {val_loss:.4f} | val MAE: {val_mae:.4f} | val R²: {val_r2:.4f} | lr: {optimizer.param_groups[0]['lr']:.2e}")
 
     # final test evaluation
-    model.load_state_dict(torch.load("/Users/arcadio/flory_huggins/models/best_model.pt"))
+    model.load_state_dict(torch.load("/models/best_model.pt"))
     test_loss, test_mae, test_r2 = evaluate(model, test_loader, criterion, device)
     print(f"\n=== Test set ===")
     print(f"MAE: {test_mae:.4f} | R²: {test_r2:.4f}")
