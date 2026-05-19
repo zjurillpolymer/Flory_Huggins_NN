@@ -43,9 +43,9 @@ class Decoder(nn.Module):
 
 class ChiPredictor(nn.Module):
     """完整模型"""
-    def __init__(self, dropout=0.1):
+    def __init__(self, in_channels=24, dropout=0.1):
         super().__init__()
-        self.encoder = Encoder()
+        self.encoder = Encoder(in_channels=in_channels)
         self.dropout = nn.Dropout(dropout)
         self.attention = MultiScaleAttention()
         self.decoder = Decoder()

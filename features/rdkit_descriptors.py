@@ -43,11 +43,22 @@ def main():
 
     # 拼接：原始列 + Polymer(12) + Solvent(12) = 24 维特征
     result = pd.concat([df, poly_df, solv_df], axis=1)
+
+    # ── 物理约束特征（Hansen 参数近似）──
+    # 色散力: MolMR 差异平方
+    result["Phys_Dispersion_sq"] = (poly_df["Polymer_MolMR"] - solv_df["Solvent_MolMR"]) ** 2
+    # 极性: TPSA 差异平方
+    result["Phys_Polarity_sq"] = (poly_df["Polymer_TPSA"] - solv_df["Solvent_TPSA"]) ** 2
+    # 氢键: (HBA+HBD) 差异平方
+    poly_HB = poly_df["Polymer_NumHAcceptors"] + poly_df["Polymer_NumHDonors"]
+    solv_HB = solv_df["Solvent_NumHAcceptors"] + solv_df["Solvent_NumHDonors"]
+    result["Phys_HBond_sq"] = (poly_HB - solv_HB) ** 2
+
     result.to_pickle(SAVE_PATH)
 
     print(f"\n✓ 保存至 features/rdkit_descriptors.pkl")
     print(f"  形状: {result.shape} ({len(df)} 条 × {len(result.columns)} 列)")
-    print(f"  特征: Polymer(12) + Solvent(12) = 24 维")
+    print(f"  特征: Polymer(12) + Solvent(12) + Phys(3) = 27 维")
 
     valid = result.dropna(subset=[f"Polymer_{n}" for n in DESCRIPTOR_NAMES]
                                    + [f"Solvent_{n}" for n in DESCRIPTOR_NAMES])

@@ -6,7 +6,7 @@ from torch.utils.data import TensorDataset, DataLoader
 from sklearn.model_selection import train_test_split
 
 FEATURES_PATH = '/Users/arcadio/flory_huggins/features/rdkit_descriptors.pkl'
-FEATURE_COLS_PREFIX = ("Polymer_", "Solvent_")
+FEATURE_COLS_PREFIX = ("Polymer_", "Solvent_", "Phys_")
 TARGET_COL = "chi"
 
 
